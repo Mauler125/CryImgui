@@ -33,7 +33,12 @@ void Cry::Imgui::CPerformanceMonitor::Update()
 void Cry::Imgui::CPerformanceMonitor::Draw()
 {
 	ImGui::SetNextWindowPos({ 0,0 });
-	ImGui::Begin("PerfMon", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
+	if (!ImGui::Begin("PerfMon", nullptr, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground)
+	|| m_fps.empty()) // Can't divide by zero.
+	{
+		ImGui::End();
+		return;
+	}
 
 	float avaragedFPS = std::accumulate(m_fps.begin(), m_fps.end(), 0) / m_fps.size();
 
