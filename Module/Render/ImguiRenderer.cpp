@@ -8,8 +8,8 @@
 using namespace Cry::Renderer;
 using namespace Cry::Renderer::Pipeline;
 
-static uint32 gPassCrc = CCrc32::Compute_CompileTime("ImguiPass");
-static uint32 gTechniqueCrc = CCrc32::ComputeLowercase_CompileTime("Imgui");
+static uint32 gPassCrc = CCrc32::Compute_CompileTime("ImGuiPass");
+static uint32 gTechniqueCrc = CCrc32::ComputeLowercase_CompileTime("ImGui");
 
 static Shader::SInputElementDescription local_layout[] =
 {
@@ -22,14 +22,14 @@ static int gLayoutID = 0;
 
 static auto gMvpConstant = std::make_pair("mvpMatrix", 0);
 
-constexpr auto imguiHash = CCrc32::Compute_CompileTime("Imgui");
+constexpr auto imguiHash = CCrc32::Compute_CompileTime("ImGui");
 
 CImguiRenderer::CImguiRenderer(Vec2i rtDimensions)
 	: m_renderDimensions(rtDimensions)
 {
 	m_pPipeline = Cry::Renderer::Pipeline::GetOrCreateCustomPipeline();
 
-	auto pShader = gEnv->pRenderer->EF_LoadShader("Imgui");
+	auto pShader = gEnv->pRenderer->EF_LoadShader("ImGui");
 	if (!pShader)
 		return;
 	m_pImguiShader.Assign_NoAddRef(pShader);
@@ -40,7 +40,7 @@ CImguiRenderer::CImguiRenderer(Vec2i rtDimensions)
 		[this](StageDestructionsArguments& args) { RT_Shutdown(args); },
 	};
 
-	m_pPipeline->CreateRenderStage("Imgui", imguiHash, std::move(callbacks));
+	m_pPipeline->CreateRenderStage("ImGui", imguiHash, std::move(callbacks));
 }
 
 
@@ -87,7 +87,7 @@ void CImguiRenderer::RT_Initalize(const Cry::Renderer::Pipeline::StageCreationAr
 	memcpy(&m_mvpConstant, mvp.GetData(), sizeof(Matrix44));
 
 	Pipeline::Pass::SPassCreationParams passParams;
-	passParams.passName = "ImguiPass";
+	passParams.passName = "ImGuiPass";
 	passParams.passCrc = gPassCrc;
 	UpdatePassParams(passParams);
 
@@ -363,7 +363,7 @@ void CImguiRenderer::AdjustRenderMeshes()
 	}
 	else if (numNewMeshes < 0)
 	{
-		//Free unnecessaty buffers
+		//Free unnecessary buffers
 		int newLastIdx = (m_bufferHandles.size() - numNewMeshes) - 1;
 		for (int i = newLastIdx; i < m_bufferHandles.size(); ++i)
 		{

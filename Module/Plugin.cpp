@@ -84,7 +84,7 @@ void CPlugin::OnSystemEvent(ESystemEvent event, UINT_PTR wparam, UINT_PTR lparam
 			gEnv->pSchematyc->GetEnvRegistry().RegisterPackage(
 				stl::make_unique<Schematyc::CEnvPackage>(
 					CPlugin::GetCID(),
-					"Imgui",
+					"ImGui",
 					"",
 					"UI",
 					staticAutoRegisterLambda

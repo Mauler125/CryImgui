@@ -20,7 +20,7 @@ public:
 	#else
 	CRYINTERFACE_SIMPLE(IEnginePlugin)
 	#endif
-	CRYGENERATE_SINGLETONCLASS_GUID(CPlugin, "CryImgui", "DD0FF1F4-29CA-42CF-BDF3-C55FCD9FE61C"_cry_guid)
+	CRYGENERATE_SINGLETONCLASS_GUID(CPlugin, "CryImGui", "DD0FF1F4-29CA-42CF-BDF3-C55FCD9FE61C"_cry_guid)
 
 	PLUGIN_FLOWNODE_REGISTER
 	PLUGIN_FLOWNODE_UNREGISTER
@@ -28,7 +28,7 @@ public:
 	virtual ~CPlugin();
 	
 	//! Retrieve name of plugin.
-	virtual const char* GetName() const override { return "CryImgui"; }
+	virtual const char* GetName() const override { return "CryImGui"; }
 
 	//! Retrieve category for the plugin.
 	virtual const char* GetCategory() const override { return "UI"; }

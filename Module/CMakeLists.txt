@@ -9,7 +9,7 @@ endif()
 
 start_sources()
 sources_platform(ALL)
-add_sources("CryImgui_core.cpp"
+add_sources("CryImGui_core.cpp"
 	SOURCE_GROUP "Root"
 		"Plugin.cpp"
 		"Plugin.h"
@@ -22,19 +22,19 @@ add_sources("CryImgui_core.cpp"
 		"resource.h"
 )
 
-add_sources("CryImgui_renderer.cpp"
+add_sources("CryImGui_renderer.cpp"
 SOURCE_GROUP "Render"
 	"Render/ImguiRenderer.h"
 	"Render/ImguiRenderer.cpp"
 )
 
-add_sources("CryImgui_nodes.cpp"
+add_sources("CryImGui_nodes.cpp"
 SOURCE_GROUP "Flowgraph"
 	"Flowgraph/ImguiNodes.cpp"
 	"Flowgraph/ImguiNodes.h"
 )
 
-add_sources("CryImgui_imgui.cpp"
+add_sources("CryImGui_imgui.cpp"
 SOURCE_GROUP "Imgui"
     "Imgui/imconfig.h"
 	"Imgui/imgui.cpp"
@@ -48,7 +48,7 @@ SOURCE_GROUP "Imgui"
 	"Imgui/imstb_truetype.h"
 )
 
-add_sources("CryImgui_Widgets.cpp"
+add_sources("CryImGui_Widgets.cpp"
 SOURCE_GROUP "Widgets"
 	"Widgets/PerfMonitor.cpp"
 	"Widgets/PerfMonitor.h"
@@ -62,7 +62,7 @@ add_sources("NoUberFile"
 end_sources()
 
 
-CryEngineModule(CryImgui PCH "StdAfx.cpp" SOLUTION_FOLDER "CryPlugins")
+CryEngineModule(CryImGui PCH "StdAfx.cpp" SOLUTION_FOLDER "CryPlugins")
 
 target_link_options(${THIS_PROJECT} PUBLIC /INCREMENTAL)
 target_compile_options(${THIS_PROJECT} PUBLIC /ZI)

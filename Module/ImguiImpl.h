@@ -48,9 +48,9 @@ private:
 
 	void InitImguiFontTexture();
 
-	_smart_ptr<ITexture>			m_pFontTexture = nullptr;
-	IMaterial*			m_pFontMaterial = nullptr;
-	IMaterial*			m_pImageTest = nullptr;
+	_smart_ptr<ITexture> m_pFontTexture = nullptr;
+	IMaterial*			 m_pFontMaterial = nullptr;
+	IMaterial*			 m_pImageTest = nullptr;
 
 	std::unique_ptr<CImguiRenderer> m_pRenderer;
 

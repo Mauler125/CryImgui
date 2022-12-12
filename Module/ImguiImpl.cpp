@@ -14,24 +14,24 @@
 #include "Widgets/PerfMonitor.h"
 
 static CImguiImpl* g_pThis = nullptr;
-static bool bCaptured = false;
+static bool s_bCaptured = false;
 
 static void ImguiCaptureMouse(IConsoleCmdArgs* pArgs)
 {
 	if (!g_pThis)
 		return;
 
-	if (!bCaptured)
+	if (!s_bCaptured)
 	{
 		gEnv->pHardwareMouse->IncrementCounter();
 		gEnv->pGameFramework->GetIActionMapManager()->Enable(false);
-		bCaptured = true;
+		s_bCaptured = true;
 	}
 	else
 	{
 		gEnv->pHardwareMouse->DecrementCounter();
 		gEnv->pGameFramework->GetIActionMapManager()->Enable(true);
-		bCaptured = false;
+		s_bCaptured = false;
 	}
 	
 }
@@ -41,13 +41,13 @@ CImguiImpl::CImguiImpl()
 {
 	g_pThis = this;
 
-	CryLogAlways("[CryImgui] Initializing implementation...");
+	CryLogAlways("[CryImGui] Initializing implementation...");
 
 	ConsoleRegistrationHelper::AddCommand("imgui_captureInput", ImguiCaptureMouse, 0, "Capture input for imgui");
 	ConsoleRegistrationHelper::Register("imgui_showDemoWindow", &m_bShowDemoWindow, 0,0, "Show imgui demo window");
 	ConsoleRegistrationHelper::Register("imgui_showPerfWidget", &m_showPerfWidget, 0, 0, "Show a small performance widget");
 	
-	gEnv->pSystem->GetISystemEventDispatcher()->RegisterListener(this, "imguiimpl");
+	gEnv->pSystem->GetISystemEventDispatcher()->RegisterListener(this, "CImguiImpl");
 }
 
 CImguiImpl::~CImguiImpl()
@@ -104,11 +104,11 @@ void CImguiImpl::InitImgui()
 	keyMap[ImGuiKey_Enter] = EKeyId::eKI_Enter;
 	keyMap[ImGuiKey_Escape] = EKeyId::eKI_Escape;
 	keyMap[ImGuiKey_A] = EKeyId::eKI_A;  // for text edit CTRL+A: select all
-	keyMap[ImGuiKey_C] = EKeyId::eKI_C;        // for text edit CTRL+C: copy
-	keyMap[ImGuiKey_V] = EKeyId::eKI_V;       // for text edit CTRL+V: paste
-	keyMap[ImGuiKey_X] = EKeyId::eKI_X;       // for text edit CTRL+X: cut
-	keyMap[ImGuiKey_Y] = EKeyId::eKI_Y;       // for text edit CTRL+Y: redo
-	keyMap[ImGuiKey_Z] = EKeyId::eKI_Z;      // for text edit CTRL+Z: undo
+	keyMap[ImGuiKey_C] = EKeyId::eKI_C;  // for text edit CTRL+C: copy
+	keyMap[ImGuiKey_V] = EKeyId::eKI_V;  // for text edit CTRL+V: paste
+	keyMap[ImGuiKey_X] = EKeyId::eKI_X;  // for text edit CTRL+X: cut
+	keyMap[ImGuiKey_Y] = EKeyId::eKI_Y;  // for text edit CTRL+Y: redo
+	keyMap[ImGuiKey_Z] = EKeyId::eKI_Z;  // for text edit CTRL+Z: undo
 
 	m_pPerfMon = std::make_unique<Cry::Imgui::CPerformanceMonitor>();
 }
@@ -129,7 +129,7 @@ void CImguiImpl::Update()
 	ImGuiIO& io = ImGui::GetIO();
 	io.DeltaTime = gEnv->pTimer->GetFrameTime() ? gEnv->pTimer->GetFrameTime() : 1;
 	io.DisplaySize = ImVec2((float)gEnv->pRenderer->GetWidth(), (float)gEnv->pRenderer->GetHeight());
-	if (bCaptured)
+	if (s_bCaptured)
 		gEnv->pHardwareMouse->GetHardwareMouseClientPosition(&io.MousePos.x, &io.MousePos.y);
 
 
@@ -144,13 +144,13 @@ void CImguiImpl::Update()
 	
 	ImGui::NewFrame();
 
-	bool show_test_window = m_bShowDemoWindow;
-	if (show_test_window)
+	bool bShowDemoWindow = m_bShowDemoWindow;
+	if (bShowDemoWindow)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::ShowDemoWindow(&show_test_window);
+		ImGui::ShowDemoWindow(&bShowDemoWindow);
 	}
-	m_bShowDemoWindow = show_test_window;
+	m_bShowDemoWindow = bShowDemoWindow;
 
 	if (m_showPerfWidget)
 		m_pPerfMon->Update();
@@ -160,7 +160,7 @@ void CImguiImpl::InitImguiFontTexture()
 {
 	if (!gEnv->pRenderer)
 	{
-		CryLogAlways("[CryImgui] Renderer not present, cant initialize");
+		CryLogAlways("[CryImGui] Failed to initialize; renderer not present.");
 		return;
 	}
 
@@ -172,7 +172,7 @@ void CImguiImpl::InitImguiFontTexture()
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 	//io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
 
-	auto pFontTexture = gEnv->pRenderer->CreateTexture("ImguiFontAtlas", width, height, 1, pixels, eTF_R8G8B8A8, 0);
+	auto pFontTexture = gEnv->pRenderer->CreateTexture("ImGuiFontAtlas", width, height, 1, pixels, eTF_R8G8B8A8, 0);
 	m_pFontTexture.Assign_NoAddRef(pFontTexture);
 	m_pRenderer->m_pFontTexture = pFontTexture;	
 	io.Fonts->TexID = pFontTexture;
@@ -209,7 +209,7 @@ void CImguiImpl::OnSystemEvent(ESystemEvent event, UINT_PTR wparam, UINT_PTR lpa
 
 void CImguiImpl::OnHardwareMouseEvent(int iX, int iY, EHARDWAREMOUSEEVENT eHardwareMouseEvent, int wheelDelta /*= 0*/)
 {
-	if (!bCaptured)
+	if (!s_bCaptured)
 		return;
 
 	m_cachedMouseEvents.emplace_back(iX, iY, eHardwareMouseEvent, wheelDelta);
@@ -222,7 +222,7 @@ bool CImguiImpl::OnInputEvent(const SInputEvent& event)
 	if (event.keyId == eKI_F9 && event.state == eIS_Pressed)
 		ImguiCaptureMouse(nullptr);
 
-	if (!bCaptured || event.keyId == eKI_SYS_Commit)
+	if (!s_bCaptured || event.keyId == eKI_SYS_Commit)
 		return false;
 	
 	m_cachedInputEvents.push_back(event);
@@ -234,7 +234,7 @@ void CImguiImpl::OnCachedInputEvent(const SInputEvent &event)
 {
 	auto &io = ImGui::GetIO();
 
-	if (!bCaptured || event.keyId == eKI_SYS_Commit)
+	if (!s_bCaptured || event.keyId == eKI_SYS_Commit)
 		return;
 
 	bool isDown = false;
@@ -284,7 +284,7 @@ void CImguiImpl::OnCachedInputEvent(const SInputEvent &event)
 
 void CImguiImpl::OnCachedMouseEvent(int iX, int iY, EHARDWAREMOUSEEVENT eHardwareMouseEvent, int wheelDelta /*= 0*/)
 {
-	if (!bCaptured)
+	if (!s_bCaptured)
 		return;
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -335,5 +335,3 @@ void CImguiImpl::DrawPerformance()
 	SDebugFPSInfo info;
 	gEnv->p3DEngine->FillDebugFPSInfo(info);
 }
-
-
